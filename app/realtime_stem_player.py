@@ -252,7 +252,6 @@ class RealTimeStemPlayer:
         
         position_seconds = float(value)
         self.audio_engine.set_position_seconds(position_seconds)
-        print(f"⏭️ Position changed to: {position_seconds:.1f}s")
     
     def on_position_click(self, event):
         """Handle clicking directly on the position slider to jump to position"""

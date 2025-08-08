@@ -8,35 +8,27 @@ from calibrate.split_audio import split_song
 
 class RealTimeStemAudioEngine:
     """Real-time audio engine using sounddevice for seamless mixing"""
-    
-    def __init__(self, sample_rate=44100, block_size=256):  # Smaller block for lower latency
+    def __init__(self, sample_rate=44100, block_size=512):
         self.sample_rate = sample_rate
         self.block_size = block_size
         
         # Audio data storage
         self.original_stems = {}
         self.processed_stems = {}
-        
-        # Real-time control parameters
         self.volumes = {"vocals": 1.0, "drums": 1.0, "bass": 1.0, "other": 1.0}
         self.master_volume = 1.0
         self.is_playing = False
         self.current_position = 0
-        
-        # Stream
         self.stream = None
         
-        # Initialize sounddevice with optimized settings
+        # Simple sounddevice setup
         try:
+            import sounddevice as sd
             sd.default.samplerate = self.sample_rate
             sd.default.channels = 2
             sd.default.dtype = 'float32'
-            sd.default.latency = 'low'
-            sd.default.never_drop_input = False  # Allow dropping for better performance
-            print(f"✅ Sounddevice initialized: {sd.default.device}")
-            print(f"   Sample rate: {self.sample_rate}, Block size: {self.block_size}")
         except Exception as e:
-            print(f"❌ Sounddevice initialization error: {e}")
+            print(f"❌ Sounddevice error: {e}")
     
     def load_song_stems(self, file_path):
         """Load and prepare stems for real-time playback"""

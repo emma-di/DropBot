@@ -5,91 +5,207 @@
   "sections": [
     {
       "start": 0.0,
-      "label": 4.0
+      "label": 5.0,
+      "dj_label": "intro",
+      "mix_priority": "high",
+      "duration": 2.46
     },
     {
       "start": 2.46,
-      "label": 2.0
+      "label": 4.0,
+      "dj_label": "intro/buildup",
+      "mix_priority": "medium",
+      "duration": 0.56
     },
     {
       "start": 3.02,
-      "label": 2.0
+      "label": 4.0,
+      "dj_label": "intro/buildup",
+      "mix_priority": "medium",
+      "duration": 12.58
     },
     {
       "start": 15.6,
-      "label": 2.0
+      "label": 4.0,
+      "dj_label": "intro/buildup",
+      "mix_priority": "medium",
+      "duration": 33.12
     },
     {
       "start": 48.72,
-      "label": 2.0
+      "label": 3.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 9.19
     },
     {
       "start": 57.91,
-      "label": 1.0
+      "label": 1.0,
+      "dj_label": "main_section",
+      "mix_priority": "medium",
+      "duration": 4.55
     },
     {
       "start": 62.46,
-      "label": 3.0
+      "label": 1.0,
+      "dj_label": "main_section",
+      "mix_priority": "medium",
+      "duration": 4.55
     },
     {
       "start": 67.01,
-      "label": 1.0
+      "label": 1.0,
+      "dj_label": "main_section",
+      "mix_priority": "medium",
+      "duration": 4.6
     },
     {
       "start": 71.61,
-      "label": 3.0
+      "label": 1.0,
+      "dj_label": "main_section",
+      "mix_priority": "medium",
+      "duration": 22.85
     },
     {
       "start": 94.46,
-      "label": 2.0
+      "label": 2.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 17.74
     },
     {
       "start": 112.2,
-      "label": 0.0
+      "label": 3.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 18.81
     },
     {
       "start": 131.01,
-      "label": 2.0
+      "label": 3.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 22.89
     },
     {
       "start": 153.9,
-      "label": 0.0
+      "label": 2.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 4.55
     },
     {
       "start": 158.45,
-      "label": 2.0
+      "label": 2.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 4.6
     },
     {
       "start": 163.05,
-      "label": 0.0
+      "label": 2.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 13.7
     },
     {
       "start": 176.75,
-      "label": 2.0
+      "label": 3.0,
+      "dj_label": "bridge/variation",
+      "mix_priority": "low",
+      "duration": 26.84
     },
     {
       "start": 203.59,
-      "label": 3.0
+      "label": 1.0,
+      "dj_label": "main_section",
+      "mix_priority": "medium",
+      "duration": 0.56
     },
     {
       "start": 204.15,
-      "label": 1.0
+      "label": 1.0,
+      "dj_label": "main_section",
+      "mix_priority": "medium",
+      "duration": 4.6
     },
     {
       "start": 208.75,
-      "label": 3.0
+      "label": 1.0,
+      "dj_label": "outro/breakdown",
+      "mix_priority": "high",
+      "duration": 22.85
     },
     {
       "start": 231.6,
-      "label": 1.0
+      "label": 2.0,
+      "dj_label": "outro/breakdown",
+      "mix_priority": "high",
+      "duration": 9.14
     },
     {
       "start": 240.74,
-      "label": 1.0
+      "label": 2.0,
+      "dj_label": "outro/breakdown",
+      "mix_priority": "high",
+      "duration": 19.74
     },
     {
       "start": 260.48,
-      "label": 4.0
+      "label": 5.0,
+      "dj_label": "outro",
+      "mix_priority": "high",
+      "duration": 0.04
     }
-  ]
+  ],
+  "dj_cues": {
+    "mix_in_points": [
+      {
+        "time": 15.6,
+        "confidence": "high",
+        "reason": "end_of_intro"
+      }
+    ],
+    "mix_out_points": [
+      {
+        "time": 203.59,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 204.15,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 208.75,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 231.6,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 240.74,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 260.48,
+        "confidence": "high",
+        "reason": "repeated_section"
+      }
+    ],
+    "breakdown_points": [
+      {
+        "time": 240.74,
+        "duration": 19.74,
+        "energy_ratio": 0.412,
+        "confidence": "medium"
+      }
+    ]
+  },
+  "analysis_version": "1.1"
 }

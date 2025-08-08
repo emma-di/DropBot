@@ -43,6 +43,116 @@ def estimate_key(chroma):
     
     return f"{best_key} {best_mode}"
 
+def find_transition_points(y, sr, sections, duration, bpm):
+    """Find good spots for DJ transitions"""
+    
+    # Calculate RMS energy
+    hop_length = 512
+    rms = librosa.feature.rms(y=y, hop_length=hop_length)[0]
+    times = librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=hop_length)
+    
+    # Calculate average energy (convert to Python float)
+    avg_energy = float(np.mean(rms))
+    
+    transition_points = {
+        "mix_in_points": [],
+        "mix_out_points": [],
+        "breakdown_points": []
+    }
+    
+    # Find intro end (good mix-in point after intro builds up)
+    intro_threshold = min(60, duration * 0.25)  # First 25% or 60 seconds max
+    for i, section in enumerate(sections):
+        if section['start'] > 10 and section['start'] <= intro_threshold:
+            transition_points["mix_in_points"].append({
+                "time": round(float(section['start']), 2),
+                "confidence": "high",
+                "reason": "end_of_intro"
+            })
+            break
+    
+    # Find breakdown sections (low energy moments)
+    for i, section in enumerate(sections):
+        if i < len(sections) - 1:
+            start_time = section['start']
+            end_time = sections[i+1]['start']
+            
+            # Get energy for this section
+            start_idx = np.argmin(np.abs(times - start_time))
+            end_idx = np.argmin(np.abs(times - end_time))
+            
+            if start_idx < len(rms) and end_idx < len(rms):
+                section_energy = float(np.mean(rms[start_idx:end_idx]))
+                
+                # If section has notably low energy, mark as breakdown
+                if section_energy < avg_energy * 0.7 and start_time > 30:
+                    transition_points["breakdown_points"].append({
+                        "time": round(float(start_time), 2),
+                        "duration": round(float(end_time - start_time), 2),
+                        "energy_ratio": round(section_energy / avg_energy, 3),
+                        "confidence": "medium"
+                    })
+    
+    # Find good mix-out points (usually in last 25% of song)
+    mix_out_start = duration * 0.75
+    for section in sections:
+        if section['start'] > mix_out_start:
+            # Check if this section repeats earlier (likely chorus/outro)
+            is_repeated = any(s['label'] == section['label'] for s in sections if s['start'] < mix_out_start)
+            
+            confidence = "high" if is_repeated else "medium"
+            transition_points["mix_out_points"].append({
+                "time": round(float(section['start']), 2),
+                "confidence": confidence,
+                "reason": "repeated_section" if is_repeated else "outro_section"
+            })
+    
+    return transition_points
+
+def enhance_sections_for_dj(sections, duration):
+    """Add DJ-specific labels and information to sections"""
+    enhanced_sections = []
+    
+    # Calculate label frequencies for pattern detection
+    label_counts = {}
+    for section in sections:
+        label_counts[section['label']] = label_counts.get(section['label'], 0) + 1
+    
+    most_frequent_label = max(label_counts, key=label_counts.get) if label_counts else None
+    
+    for i, section in enumerate(sections):
+        enhanced_section = section.copy()
+        
+        # Add semantic labels based on position and patterns
+        if i == 0:
+            enhanced_section['dj_label'] = 'intro'
+            enhanced_section['mix_priority'] = 'high'  # Good for mixing in
+        elif i == len(sections) - 1:
+            enhanced_section['dj_label'] = 'outro'
+            enhanced_section['mix_priority'] = 'high'  # Good for mixing out
+        elif section['start'] < 30:
+            enhanced_section['dj_label'] = 'intro/buildup'
+            enhanced_section['mix_priority'] = 'medium'
+        elif section['start'] > duration * 0.8:
+            enhanced_section['dj_label'] = 'outro/breakdown'
+            enhanced_section['mix_priority'] = 'high'
+        elif section['label'] == most_frequent_label:
+            enhanced_section['dj_label'] = 'main_section'  # Likely verse or chorus
+            enhanced_section['mix_priority'] = 'medium'
+        else:
+            enhanced_section['dj_label'] = 'bridge/variation'
+            enhanced_section['mix_priority'] = 'low'
+        
+        # Add duration if we can calculate it
+        if i < len(sections) - 1:
+            enhanced_section['duration'] = round(sections[i+1]['start'] - section['start'], 2)
+        else:
+            enhanced_section['duration'] = round(duration - section['start'], 2)
+        
+        enhanced_sections.append(enhanced_section)
+    
+    return enhanced_sections
+
 def analyze_song(file_path):
     y, sr = librosa.load(file_path, mono=True)
     bpm, _ = librosa.beat.beat_track(y=y, sr=sr)
@@ -64,13 +174,19 @@ def analyze_song(file_path):
         boundaries, labels = msaf.process(
             temp_path,
             boundaries_id="olda",
-            labels_id="scluster"
+            labels_id="cnmf"  # Changed from scluster to cnmf for better stability
         )
         
-        section_info = [
-            {"start": round(float(start), 2), "label": label}
+        basic_sections = [
+            {"start": round(float(start), 2), "label": float(label)}
             for start, label in zip(boundaries, labels)
         ]
+        
+        # Enhance sections with DJ information
+        enhanced_sections = enhance_sections_for_dj(basic_sections, duration)
+        
+        # Find transition points
+        transition_points = find_transition_points(y, sr, basic_sections, duration, bpm)
         
     finally:
         # Clean up temporary file
@@ -80,8 +196,10 @@ def analyze_song(file_path):
             pass
 
     return {
-        "bpm": round(float(bpm)),
+        "bpm": int(round(float(bpm))),
         "key": key,
-        "duration": round(duration, 2),
-        "sections": section_info
+        "duration": round(float(duration), 2),
+        "sections": enhanced_sections,
+        "dj_cues": transition_points,
+        "analysis_version": "1.1"  # Track version for future compatibility
     }
