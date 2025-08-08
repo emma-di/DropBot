@@ -1,0 +1,286 @@
+{
+  "bpm": 99,
+  "key": "F minor",
+  "duration": 238.86,
+  "sections": [
+    {
+      "start": 0.0,
+      "label": 5.0,
+      "dj_label": "intro",
+      "confidence": 0.9,
+      "duration": 0.23,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 0.23,
+      "label": 2.0,
+      "dj_label": "intro",
+      "confidence": 0.9,
+      "duration": 5.25,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 5.48,
+      "label": 2.0,
+      "dj_label": "intro",
+      "confidence": 0.9,
+      "duration": 9.43,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 14.91,
+      "label": 2.0,
+      "dj_label": "intro",
+      "confidence": 0.9,
+      "duration": 9.7,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 24.61,
+      "label": 2.0,
+      "dj_label": "breakdown",
+      "confidence": 0.7,
+      "duration": 2.88,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 27.49,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.7,
+      "duration": 15.98,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 43.47,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.7,
+      "duration": 9.61,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 53.08,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 12.63,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 65.71,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 13.8,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 79.51,
+      "label": 4.0,
+      "dj_label": "verse_2",
+      "confidence": 0.8,
+      "duration": 11.61,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 91.12,
+      "label": 4.0,
+      "dj_label": "verse_2",
+      "confidence": 0.8,
+      "duration": 13.79,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 104.91,
+      "label": 2.0,
+      "dj_label": "breakdown",
+      "confidence": 0.7,
+      "duration": 4.04,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 108.95,
+      "label": 2.0,
+      "dj_label": "verse",
+      "confidence": 0.4,
+      "duration": 8.36,
+      "energy_level": "medium",
+      "mix_priority": "low"
+    },
+    {
+      "start": 117.31,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.7,
+      "duration": 8.59,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 125.9,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.7,
+      "duration": 7.06,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 132.96,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 4.92,
+      "energy_level": "medium",
+      "mix_priority": "high"
+    },
+    {
+      "start": 137.88,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.7,
+      "duration": 4.83,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 142.71,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 14.4,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 157.11,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 13.37,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 170.48,
+      "label": 3.0,
+      "dj_label": "verse",
+      "confidence": 0.4,
+      "duration": 7.8,
+      "energy_level": "high",
+      "mix_priority": "low"
+    },
+    {
+      "start": 178.28,
+      "label": 3.0,
+      "dj_label": "verse",
+      "confidence": 0.4,
+      "duration": 6.04,
+      "energy_level": "medium",
+      "mix_priority": "low"
+    },
+    {
+      "start": 184.32,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 13.19,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 197.51,
+      "label": 1.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 13.56,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 211.07,
+      "label": 4.0,
+      "dj_label": "verse",
+      "confidence": 0.4,
+      "duration": 11.84,
+      "energy_level": "medium",
+      "mix_priority": "low"
+    },
+    {
+      "start": 222.91,
+      "label": 3.0,
+      "dj_label": "outro",
+      "confidence": 0.9,
+      "duration": 15.93,
+      "energy_level": "medium",
+      "mix_priority": "high"
+    },
+    {
+      "start": 238.84,
+      "label": 5.0,
+      "dj_label": "outro",
+      "confidence": 0.9,
+      "duration": 0.02,
+      "energy_level": "medium",
+      "mix_priority": "high"
+    }
+  ],
+  "dj_cues": {
+    "mix_in_points": [
+      {
+        "time": 14.91,
+        "confidence": "high",
+        "reason": "end_of_intro"
+      }
+    ],
+    "mix_out_points": [
+      {
+        "time": 184.32,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 197.51,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 211.07,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 222.91,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 238.84,
+        "confidence": "high",
+        "reason": "repeated_section"
+      }
+    ],
+    "breakdown_points": [
+      {
+        "time": 104.91,
+        "duration": 4.04,
+        "energy_ratio": 0.685,
+        "confidence": "medium"
+      }
+    ]
+  },
+  "analysis_version": "1.2"
+}

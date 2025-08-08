@@ -5,12 +5,15 @@ from tkinter import HORIZONTAL
 from app.sounddevice_audio_engine import RealTimeStemAudioEngine
 import threading
 import time
+import json
+import os
 
 class RealTimeStemPlayer:
     def __init__(self):
         self.audio_engine = RealTimeStemAudioEngine()
         self.is_playing = False
         self.song_name = ""
+        self.song_metadata = None  # Store song analysis data
         
         # Control parameters
         self.volumes = {"vocals": 1.0, "drums": 1.0, "bass": 1.0, "other": 1.0}
@@ -24,6 +27,97 @@ class RealTimeStemPlayer:
         self.should_update_position = False
         
         self.setup_gui()
+    
+    def load_song_metadata(self, song_name):
+        """Load song analysis metadata from JSON file, generate if missing"""
+        try:
+            # Load from the standard metadata location
+            metadata_path = f"data/metadata/{song_name}.json"
+            
+            if os.path.exists(metadata_path):
+                print(f"📊 Loading song analysis from: {metadata_path}")
+                with open(metadata_path, 'r') as f:
+                    self.song_metadata = json.load(f)
+                
+                print(f"✅ Loaded analysis: {len(self.song_metadata.get('sections', []))} sections")
+                print(f"🎵 BPM: {self.song_metadata.get('bpm', 'Unknown')}")
+                print(f"🎼 Key: {self.song_metadata.get('key', 'Unknown')}")
+                
+                return True
+            else:
+                print(f"⚠️ No analysis file found at: {metadata_path}")
+                print(f"🔄 Attempting to generate analysis using calibrate...")
+                
+                # Try to generate the metadata using calibrate
+                if self.generate_song_metadata(song_name):
+                    # Try loading again after generation
+                    return self.load_song_metadata(song_name)
+                else:
+                    print(f"❌ Failed to generate metadata for {song_name}")
+                    self.song_metadata = None
+                    return False
+                
+        except Exception as e:
+            print(f"❌ Error loading song metadata: {e}")
+            self.song_metadata = None
+            return False
+    
+    def generate_song_metadata(self, song_name):
+        """Generate song metadata using calibrate/analyze_audio.py"""
+        try:
+            print(f"🎯 Generating metadata for: {song_name}")
+            
+            # Import the analyze function from calibrate
+            import sys
+            sys.path.append('calibrate')
+            from analyze_audio import analyze_song
+            import json
+            
+            # Audio files are always in data/mp3s/
+            possible_audio_paths = [
+                f"data/mp3s/{song_name}.mp3",
+                f"data/mp3s/{song_name}.wav"
+            ]
+            
+            audio_file_path = None
+            for path in possible_audio_paths:
+                if os.path.exists(path):
+                    audio_file_path = path
+                    break
+            
+            if not audio_file_path:
+                print(f"❌ Could not find audio file for {song_name} in data/mp3s/")
+                return False
+            
+            print(f"🎵 Found audio file: {audio_file_path}")
+            print(f"⚙️ Running analysis... this may take a moment...")
+            
+            # Run the analysis
+            metadata = analyze_song(audio_file_path)
+            
+            if metadata:
+                # Save the metadata to the expected location
+                metadata_path = f"data/metadata/{song_name}.json"
+                os.makedirs(os.path.dirname(metadata_path), exist_ok=True)
+                
+                with open(metadata_path, 'w') as f:
+                    json.dump(metadata, f, indent=2)
+                
+                print(f"✅ Successfully generated and saved metadata to {metadata_path}")
+                return True
+            else:
+                print(f"❌ Analysis returned no metadata for {song_name}")
+                return False
+                
+        except ImportError as e:
+            print(f"❌ Could not import analyze_audio: {e}")
+            print(f"💡 Make sure calibrate/analyze_audio.py exists and has an analyze_song function")
+            return False
+        except Exception as e:
+            print(f"❌ Error generating metadata: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
     
     def load_song(self, file_path):
         """Load song using real-time audio engine"""
@@ -56,6 +150,10 @@ class RealTimeStemPlayer:
             # Load the new song
             self.song_name = self.audio_engine.load_song_stems(file_path)
             
+            # Load song analysis metadata
+            if self.song_name:
+                self.load_song_metadata(self.song_name)
+            
             print("🎵 Applying initial effects...")
             # Only apply effects if loading was successful
             if self.song_name and self.audio_engine.original_stems:
@@ -71,7 +169,10 @@ class RealTimeStemPlayer:
                 self.position_slider.config(to=int(duration))
                 self.position_slider.set(0)
             
+            # Update title and section display
             self.update_title()
+            self.update_section_display()
+            
             print("✅ New song loaded with default settings")
             
         except Exception as e:
@@ -86,7 +187,9 @@ class RealTimeStemPlayer:
             
             # Reset to safe state
             self.song_name = ""
+            self.song_metadata = None
             self.update_title()
+            self.update_section_display()
     
     # === REAL-TIME EVENT HANDLERS ===
     
@@ -426,17 +529,42 @@ class RealTimeStemPlayer:
         self.position_slider.set(int(current_pos))
         self.position_label.config(text=f"{int(current_pos//60)}:{int(current_pos%60):02d}")
         self.updating_position_from_playback = False
+        
+        # Update active section highlighting
+        self.update_active_section(current_pos)
+    
+    def update_active_section(self, current_pos):
+        """Highlight the currently playing section"""
+        if not hasattr(self, 'section_buttons') or not self.song_metadata:
+            return
+        
+        if not self.section_buttons:
+            return
+        
+        # Find current section using the consolidated button data
+        current_section = None
+        for i, btn_info in enumerate(self.section_buttons):
+            if btn_info['start'] <= current_pos < btn_info['end']:
+                current_section = i
+                break
+        
+        # Update button highlighting
+        for i, btn_info in enumerate(self.section_buttons):
+            if i == current_section:
+                btn_info['button'].config(relief="raised", bd=3)  # Highlight active section
+            else:
+                btn_info['button'].config(relief="flat", bd=1)  # Normal appearance
     
     # === GUI SETUP ===
     
     def setup_gui(self):
         """Setup the GUI"""
         self.root = Tk()
-        self.root.title("🎛️ Real-Time AI DJ Stem Player (Sounddevice)")
+        self.root.title("🎛️ Real-Time AI DJ Stem Player with Song Analysis")
         
         # Better window sizing and positioning
         window_width = 750
-        window_height = 900  # Increased from 850 to ensure everything fits
+        window_height = 950  # Increased to accommodate section display
         
         # Center the window on screen
         screen_width = self.root.winfo_screenwidth()
@@ -448,7 +576,7 @@ class RealTimeStemPlayer:
         self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
         
         # Make window resizable but set minimum size
-        self.root.minsize(650, 800)  # Also increased minimum size
+        self.root.minsize(650, 850)
         self.root.resizable(True, True)
         
         # Enable keyboard shortcuts
@@ -474,7 +602,7 @@ class RealTimeStemPlayer:
                font=("Arial", 11), bg="#FF9800", fg="white",
                width=20, height=1).pack(pady=5)
         
-        # Position control
+        # Position control with section visualization
         self._setup_position_control()
         
         # Volume, speed, pitch controls
@@ -484,20 +612,31 @@ class RealTimeStemPlayer:
         
         # Instructions
         instructions = Label(self.root,
-                           text="🎚️ VOLUME CHANGES: Real-time (no restart!)\n🏃 SPEED/PITCH: Restart required\n⌨️ SHORTCUTS: 1-4=Mute, Space=Play/Pause, R=Reset, 0=Master Mute\n🎯 Powered by sounddevice for professional mixing",
-                           font=("Arial", 10), fg="green", justify='center')
+                           text="🎚️ VOLUME CHANGES: Real-time (no restart!)\n🏃 SPEED/PITCH: Restart required\n⌨️ SHORTCUTS: 1-4=Mute, Space=Play/Pause, R=Reset, 0=Master Mute\n🎯 Click section buttons to jump to different parts\n🎵 Powered by sounddevice + song analysis",
+                           font=("Arial", 9), fg="green", justify='center')
         instructions.pack(pady=10)
         
         # Cleanup on close
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
     
     def _setup_position_control(self):
-        """Setup position/seek control"""
+        """Setup position/seek control with section visualization"""
         pos_frame = Frame(self.root)
         pos_frame.pack(pady=10, fill='x')
         
-        Label(pos_frame, text="⏯️ POSITION", font=("Arial", 12, "bold")).pack()
+        Label(pos_frame, text="⏯️ POSITION & SONG SECTIONS", font=("Arial", 12, "bold")).pack()
         
+        # Section visualization frame
+        section_container = Frame(pos_frame)
+        section_container.pack(fill='x', padx=20, pady=(5, 0))
+        
+        Label(section_container, text="Song Sections (click to jump):", font=("Arial", 9, "bold")).pack(anchor='w')
+        
+        self.section_frame = Frame(section_container, height=60, bg="white", relief="sunken", bd=1)
+        self.section_frame.pack(fill='x', pady=(2, 5))
+        self.section_frame.pack_propagate(False)  # Maintain fixed height
+        
+        # Position slider
         control_frame = Frame(pos_frame)
         control_frame.pack(fill='x', padx=20)
         
@@ -513,6 +652,9 @@ class RealTimeStemPlayer:
         
         self.position_label = Label(control_frame, text="0:00", font=("Arial", 10))
         self.position_label.pack()
+        
+        # Initialize section buttons list
+        self.section_buttons = []
     
     def _setup_volume_controls(self):
         """Setup volume control section"""
@@ -629,9 +771,151 @@ class RealTimeStemPlayer:
             self.load_song(file_path)
     
     def update_title(self):
-        """Update the title label with current song"""
+        """Update the title label with current song and metadata"""
         if self.song_name:
-            self.title_label.config(text=f"🎵 {self.song_name}")
+            title_text = f"🎵 {self.song_name}"
+            if self.song_metadata:
+                bpm = self.song_metadata.get('bpm', 'Unknown')
+                key = self.song_metadata.get('key', 'Unknown')
+                title_text += f" | {bpm} BPM | {key}"
+            self.title_label.config(text=title_text)
+        else:
+            self.title_label.config(text="No song loaded")
+    
+    def update_section_display(self):
+        """Update the section visualization with proportional, clickable buttons"""
+        if not hasattr(self, 'section_frame'):
+            return
+        
+        # Clear existing section buttons
+        for widget in self.section_frame.winfo_children():
+            widget.destroy()
+        
+        self.section_buttons = []  # Reset button list
+        
+        if not self.song_metadata or 'sections' not in self.song_metadata:
+            Label(self.section_frame, text="No section data available - load a song with analysis JSON", 
+                  font=("Arial", 9), fg="gray").pack(expand=True)
+            return
+        
+        # Create section buttons with consolidation and proportional sizing
+        sections = self.song_metadata['sections']
+        duration = self.song_metadata.get('duration', 300)
+        
+        print(f"🎨 Creating proportional section display with {len(sections)} sections")
+        
+        # Section colors based on dj_label
+        section_colors = {
+            'intro': '#FF6B6B',
+            'verse': '#45B7D1', 
+            'chorus': '#4ECDC4',
+            'outro': '#FFA726'
+        }
+        
+        # Create a container for all section buttons
+        button_container = Frame(self.section_frame)
+        button_container.pack(fill='both', expand=True, padx=2, pady=2)
+        
+        # Consolidate adjacent sections of the same type
+        consolidated_sections = []
+        i = 0
+        while i < len(sections):
+            current_section = sections[i]
+            start_time = current_section['start']
+            dj_label = current_section.get('dj_label', f"Section {i+1}")
+            
+            print(f"🔍 Processing section {i}: {dj_label} at {start_time}")
+            
+            # Find the end of this consolidated section
+            end_index = i
+            while (end_index + 1 < len(sections) and 
+                   sections[end_index + 1].get('dj_label') == dj_label):
+                end_index += 1
+                print(f"  📎 Consolidating with section {end_index + 1}")
+            
+            # Calculate total duration for consolidated section
+            if end_index < len(sections) - 1:
+                end_time = sections[end_index + 1]['start']
+            else:
+                end_time = duration
+            
+            section_duration = end_time - start_time
+            
+            # Skip very short sections (less than 1 second)
+            if section_duration >= 1.0:
+                # Create consolidated section info
+                if end_index > i:
+                    # Multiple sections consolidated
+                    section_count = end_index - i + 1
+                    display_text = f"{dj_label}\n{self.format_time(start_time)} ({section_count}x)"
+                    print(f"  ✅ Consolidated {section_count} sections into: {display_text.replace(chr(10), ' ')}")
+                else:
+                    # Single section
+                    display_text = f"{dj_label}\n{self.format_time(start_time)}"
+                    print(f"  ✅ Single section: {display_text.replace(chr(10), ' ')}")
+                
+                consolidated_sections.append({
+                    'start': start_time,
+                    'end': end_time,
+                    'duration': section_duration,
+                    'dj_label': dj_label,
+                    'display_text': display_text
+                })
+            else:
+                print(f"  ⏩ Skipping short section ({section_duration:.1f}s)")
+            
+            i = end_index + 1
+        
+        # Create proportional buttons
+        total_width = 700  # Approximate width available for buttons
+        
+        for section_info in consolidated_sections:
+            color = section_colors.get(section_info['dj_label'], '#CCCCCC')
+            
+            # Calculate proportional width based on duration
+            width_ratio = section_info['duration'] / duration
+            button_width = max(int(total_width * width_ratio), 40)  # Minimum 40 pixels
+            
+            print(f"📏 {section_info['dj_label']}: {section_info['duration']:.1f}s = {width_ratio:.1%} = {button_width}px")
+            
+            # Create clickable section button with proportional width
+            section_btn = Button(
+                button_container,
+                text=section_info['display_text'],
+                font=("Arial", 8),
+                bg=color,
+                fg="white",
+                command=lambda t=section_info['start']: self.jump_to_section(t),
+                relief="flat",
+                bd=1,
+                wraplength=max(button_width - 10, 30),  # Wrap text based on button width
+                width=max(button_width // 8, 3)  # Convert pixels to character width (rough approximation)
+            )
+            
+            # Pack without expand so buttons maintain their proportional sizes
+            section_btn.pack(side='left', fill='y', padx=1)
+            
+            # Store button reference and section info for later highlighting
+            self.section_buttons.append({
+                'button': section_btn,
+                'start': section_info['start'],
+                'end': section_info['end']
+            })
+        
+        print(f"✅ Created {len(self.section_buttons)} proportional section buttons")
+    
+    def jump_to_section(self, start_time):
+        """Jump to a specific section of the song"""
+        self.audio_engine.set_position_seconds(start_time)
+        if hasattr(self, 'position_slider'):
+            self.position_slider.set(start_time)
+        print(f"🎯 Jumped to section at {self.format_time(start_time)}")
+    
+    def format_time(self, seconds):
+        """Format seconds as MM:SS"""
+        minutes = int(seconds // 60)
+        seconds = int(seconds % 60)
+        return f"{minutes}:{seconds:02d}"
     
     def on_closing(self):
         """Clean up when closing the application"""

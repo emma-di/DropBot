@@ -1,7 +1,7 @@
 # python -m calibrate.calibrate_track
 
 from calibrate.split_audio import split_song
-from calibrate.analyze_audio_2 import analyze_song
+from calibrate.analyze_audio import analyze_song
 import json
 import os
 
