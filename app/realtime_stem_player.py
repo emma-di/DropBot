@@ -534,26 +534,28 @@ class RealTimeStemPlayer:
         self.update_active_section(current_pos)
     
     def update_active_section(self, current_pos):
-        """Highlight the currently playing section"""
-        if not hasattr(self, 'section_buttons') or not self.song_metadata:
+        """Highlight the currently playing section on canvas"""
+        if not hasattr(self, 'section_canvas') or not hasattr(self, 'section_rects'):
             return
         
-        if not self.section_buttons:
+        if not self.section_rects:
             return
         
-        # Find current section using the consolidated button data
+        # Find current section
         current_section = None
-        for i, btn_info in enumerate(self.section_buttons):
-            if btn_info['start'] <= current_pos < btn_info['end']:
+        for i, rect_info in enumerate(self.section_rects):
+            if rect_info['start'] <= current_pos < rect_info['end']:
                 current_section = i
                 break
         
-        # Update button highlighting
-        for i, btn_info in enumerate(self.section_buttons):
+        # Update rectangle highlighting on canvas
+        for i, rect_info in enumerate(self.section_rects):
             if i == current_section:
-                btn_info['button'].config(relief="raised", bd=3)  # Highlight active section
+                # Highlight active section with thicker white border
+                self.section_canvas.itemconfig(rect_info['rect_id'], width=3, outline='yellow')
             else:
-                btn_info['button'].config(relief="flat", bd=1)  # Normal appearance
+                # Normal appearance
+                self.section_canvas.itemconfig(rect_info['rect_id'], width=1, outline='white')
     
     # === GUI SETUP ===
     
@@ -783,7 +785,7 @@ class RealTimeStemPlayer:
             self.title_label.config(text="No song loaded")
     
     def update_section_display(self):
-        """Update the section visualization with proportional, clickable buttons"""
+        """Update the section visualization with proportional, clickable colored blocks"""
         if not hasattr(self, 'section_frame'):
             return
         
@@ -798,111 +800,106 @@ class RealTimeStemPlayer:
                   font=("Arial", 9), fg="gray").pack(expand=True)
             return
         
-        # Create section buttons with consolidation and proportional sizing
+        # Create simple colored blocks (no text)
         sections = self.song_metadata['sections']
         duration = self.song_metadata.get('duration', 300)
         
-        print(f"🎨 Creating proportional section display with {len(sections)} sections")
+        print(f"🎨 Creating proportional colored blocks for {len(sections)} sections")
         
         # Section colors based on dj_label
         section_colors = {
             'intro': '#FF6B6B',
             'verse': '#45B7D1', 
             'chorus': '#4ECDC4',
-            'outro': '#FFA726'
+            'outro': '#FFA726',
+            'bridge': '#96CEB4',
+            'pre_chorus': '#FF8A65',
+            'breakdown': '#9C27B0',
+            'buildup': '#795548'
         }
         
-        # Create a container for all section buttons
-        button_container = Frame(self.section_frame)
-        button_container.pack(fill='both', expand=True, padx=2, pady=2)
+        # Create a canvas for precise positioning
+        from tkinter import Canvas
+        canvas = Canvas(self.section_frame, height=40, bg='white')
+        canvas.pack(fill='x', padx=5, pady=5)
         
-        # Consolidate adjacent sections of the same type
-        consolidated_sections = []
-        i = 0
-        while i < len(sections):
-            current_section = sections[i]
-            start_time = current_section['start']
-            dj_label = current_section.get('dj_label', f"Section {i+1}")
+        # Wait for canvas to be drawn
+        self.root.update_idletasks()
+        canvas_width = canvas.winfo_width()
+        if canvas_width < 50:  # Fallback
+            canvas_width = 700
+        
+        print(f"📏 Canvas width: {canvas_width}px")
+        
+        # Draw proportional rectangles
+        canvas_rects = []
+        
+        for i, section in enumerate(sections):
+            start_time = section['start']
+            dj_label = section.get('dj_label', f"Section {i+1}")
             
-            print(f"🔍 Processing section {i}: {dj_label} at {start_time}")
-            
-            # Find the end of this consolidated section
-            end_index = i
-            while (end_index + 1 < len(sections) and 
-                   sections[end_index + 1].get('dj_label') == dj_label):
-                end_index += 1
-                print(f"  📎 Consolidating with section {end_index + 1}")
-            
-            # Calculate total duration for consolidated section
-            if end_index < len(sections) - 1:
-                end_time = sections[end_index + 1]['start']
+            # Calculate section duration
+            if i < len(sections) - 1:
+                end_time = sections[i + 1]['start']
             else:
                 end_time = duration
             
             section_duration = end_time - start_time
             
-            # Skip very short sections (less than 1 second)
-            if section_duration >= 1.0:
-                # Create consolidated section info
-                if end_index > i:
-                    # Multiple sections consolidated
-                    section_count = end_index - i + 1
-                    display_text = f"{dj_label}\n{self.format_time(start_time)} ({section_count}x)"
-                    print(f"  ✅ Consolidated {section_count} sections into: {display_text.replace(chr(10), ' ')}")
-                else:
-                    # Single section
-                    display_text = f"{dj_label}\n{self.format_time(start_time)}"
-                    print(f"  ✅ Single section: {display_text.replace(chr(10), ' ')}")
-                
-                consolidated_sections.append({
-                    'start': start_time,
-                    'end': end_time,
-                    'duration': section_duration,
-                    'dj_label': dj_label,
-                    'display_text': display_text
-                })
-            else:
-                print(f"  ⏩ Skipping short section ({section_duration:.1f}s)")
+            # Skip very short sections
+            if section_duration < 0.5:
+                continue
             
-            i = end_index + 1
-        
-        # Create proportional buttons
-        total_width = 700  # Approximate width available for buttons
-        
-        for section_info in consolidated_sections:
-            color = section_colors.get(section_info['dj_label'], '#CCCCCC')
+            # Calculate positions on canvas
+            x1 = int((start_time / duration) * canvas_width)
+            x2 = int((end_time / duration) * canvas_width)
+            width = max(x2 - x1, 2)  # Minimum 2 pixels wide
             
-            # Calculate proportional width based on duration
-            width_ratio = section_info['duration'] / duration
-            button_width = max(int(total_width * width_ratio), 40)  # Minimum 40 pixels
+            color = section_colors.get(dj_label, '#CCCCCC')
             
-            print(f"📏 {section_info['dj_label']}: {section_info['duration']:.1f}s = {width_ratio:.1%} = {button_width}px")
-            
-            # Create clickable section button with proportional width
-            section_btn = Button(
-                button_container,
-                text=section_info['display_text'],
-                font=("Arial", 8),
-                bg=color,
-                fg="white",
-                command=lambda t=section_info['start']: self.jump_to_section(t),
-                relief="flat",
-                bd=1,
-                wraplength=max(button_width - 10, 30),  # Wrap text based on button width
-                width=max(button_width // 8, 3)  # Convert pixels to character width (rough approximation)
+            # Draw rectangle on canvas
+            rect_id = canvas.create_rectangle(
+                x1, 5, x2, 35,
+                fill=color,
+                outline='white',
+                width=1,
+                tags=f"section_{i}"
             )
             
-            # Pack without expand so buttons maintain their proportional sizes
-            section_btn.pack(side='left', fill='y', padx=1)
+            # Add click binding to each rectangle
+            canvas.tag_bind(f"section_{i}", '<Button-1>', 
+                           lambda e, t=start_time: self.jump_to_section(t))
             
-            # Store button reference and section info for later highlighting
-            self.section_buttons.append({
-                'button': section_btn,
-                'start': section_info['start'],
-                'end': section_info['end']
+            # Store section info
+            canvas_rects.append({
+                'rect_id': rect_id,
+                'start': start_time,
+                'end': end_time,
+                'label': dj_label,
+                'canvas_tag': f"section_{i}"
             })
+            
+            print(f"📏 {dj_label}: {start_time:.1f}-{end_time:.1f}s = {x1}-{x2}px ({width}px wide)")
         
-        print(f"✅ Created {len(self.section_buttons)} proportional section buttons")
+        # Store canvas and rectangles for highlighting
+        self.section_canvas = canvas
+        self.section_rects = canvas_rects
+        self.section_buttons = canvas_rects  # For compatibility with existing highlighting code
+        
+        # Add a legend below the canvas
+        legend_frame = Frame(self.section_frame)
+        legend_frame.pack(fill='x', padx=5, pady=(0, 5))
+        
+        # Show unique section types in legend
+        unique_labels = list(set(s.get('dj_label', 'unknown') for s in sections))
+        for label in sorted(unique_labels):
+            color = section_colors.get(label, '#CCCCCC')
+            legend_btn = Button(legend_frame, text=label, bg=color, fg='white',
+                               font=('Arial', 8), relief='flat', bd=0,
+                               padx=8, pady=2)
+            legend_btn.pack(side='left', padx=2)
+        
+        print(f"✅ Created {len(canvas_rects)} proportional section blocks")
     
     def jump_to_section(self, start_time):
         """Jump to a specific section of the song"""
