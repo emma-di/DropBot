@@ -14,6 +14,7 @@ def calibrate_track(file_path):
 
     # Step 3: Save metadata
     out_path = os.path.join("data", "metadata", f"{song_name}.json")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     root = Tk()
     root.withdraw()
     root.update()
-    path = filedialog.askopenfilename(initialdir="data/mp3s", title="Pick a song")
+    path = filedialog.askopenfilename(initialdir=os.path.join("data", "mp3s"), title="Pick a song")
     root.destroy()
     if path:
         calibrate_track(path)
