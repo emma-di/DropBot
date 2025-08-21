@@ -1,0 +1,109 @@
+{
+  "bpm": 92,
+  "key": "G# major",
+  "duration": 187.96,
+  "sections": [
+    {
+      "start": 0.0,
+      "label": 5.0,
+      "dj_label": "intro",
+      "confidence": 0.9,
+      "duration": 14.26,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 14.26,
+      "label": 4.0,
+      "dj_label": "intro",
+      "confidence": 0.9,
+      "duration": 30.37,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 44.63,
+      "label": 3.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 41.19,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 85.82,
+      "label": 2.0,
+      "dj_label": "bridge",
+      "confidence": 0.75,
+      "duration": 13.47,
+      "energy_level": "low",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 99.29,
+      "label": 3.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 40.26,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 139.55,
+      "label": 3.0,
+      "dj_label": "chorus",
+      "confidence": 0.85,
+      "duration": 28.28,
+      "energy_level": "high",
+      "mix_priority": "high"
+    },
+    {
+      "start": 167.83,
+      "label": 4.0,
+      "dj_label": "pre_chorus",
+      "confidence": 0.6,
+      "duration": 20.11,
+      "energy_level": "low",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 187.94,
+      "label": 5.0,
+      "dj_label": "outro",
+      "confidence": 0.9,
+      "duration": 0.02,
+      "energy_level": "medium",
+      "mix_priority": "high"
+    }
+  ],
+  "dj_cues": {
+    "mix_in_points": [
+      {
+        "time": 14.26,
+        "confidence": "high",
+        "reason": "end_of_intro"
+      }
+    ],
+    "mix_out_points": [
+      {
+        "time": 167.83,
+        "confidence": "high",
+        "reason": "repeated_section"
+      },
+      {
+        "time": 187.94,
+        "confidence": "high",
+        "reason": "repeated_section"
+      }
+    ],
+    "breakdown_points": [
+      {
+        "time": 167.83,
+        "duration": 20.11,
+        "energy_ratio": 0.372,
+        "confidence": "medium"
+      }
+    ]
+  },
+  "analysis_version": "1.2"
+}

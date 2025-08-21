@@ -5,13 +5,13 @@
       "msaf": "0.1.80",
       "numpy": "1.25.2"
     },
-    "timestamp": "2025/08/08 16:27:28"
+    "timestamp": "2025/08/20 23:51:50"
   },
   "globals": {
     "dur": 187.96362811791383,
     "sample_rate": 22050,
     "hop_length": 1024,
-    "audio_file": "C:/Users/emmad/AppData/Local/Temp/tmpi26g5jzz.wav"
+    "audio_file": "C:/Users/emmad/AppData/Local/Temp/tmprde7dlsv.wav"
   },
   "est_beats": [
     14.257052154195012,

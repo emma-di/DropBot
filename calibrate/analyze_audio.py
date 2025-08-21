@@ -347,3 +347,5 @@ def analyze_song(file_path):
         "dj_cues": transition_points,
         "analysis_version": "1.2"  # Track version for future compatibility
     }
+
+# REVERTED TO VERSION 1.2 SINCE 1.3 WAS GETTING STUCK
