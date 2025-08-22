@@ -1,4 +1,4 @@
-# python -m app.realtime_stem_player
+# python -m app.waveforms_player
 
 from tkinter import Tk, Label, Scale, Button, filedialog, Frame, Entry, StringVar
 from tkinter import HORIZONTAL
@@ -164,14 +164,21 @@ class RealTimeStemPlayer:
                 self.audio_engine.apply_effects_to_stems(self.speed, self.pitch)
             else:
                 print("⚠️ Skipping effects - no stems loaded")
+
+            if self.song_name and self.audio_engine.original_stems:
+                self.audio_engine.apply_effects_to_stems(self.speed, self.pitch)
+                
+                # ADD THESE NEW LINES:
+                print("🌊 Generating waveforms...")
+                self.generate_waveforms()
+                self.update_waveform_display()
             
             # Reset position slider
             duration = self.audio_engine.get_duration_seconds()
             print(f"📏 Song duration: {duration:.1f} seconds")
             
-            if hasattr(self, 'position_slider'):
-                self.position_slider.config(to=int(duration))
-                self.position_slider.set(0)
+            if hasattr(self, 'time_display_label'):
+                self.time_display_label.config(text="0:00 / 0:00")
             
             # Update title and section display
             self.update_title()
@@ -351,44 +358,6 @@ class RealTimeStemPlayer:
             current = self.pitch_slider.get()
             self.pitch_entry.set(str(current))
     
-    def on_position_change(self, value):
-        """Handle position slider changes"""
-        # Don't respond to programmatic updates during playback
-        if hasattr(self, 'updating_position_from_playback') and self.updating_position_from_playback:
-            return
-        
-        position_seconds = float(value)
-        self.audio_engine.set_position_seconds(position_seconds)
-    
-    def on_position_click(self, event):
-        """Handle clicking directly on the position slider to jump to position"""
-        # Calculate the position based on where the user clicked
-        slider_width = self.position_slider.winfo_width()
-        click_x = event.x
-        
-        # Get the slider's range
-        slider_min = self.position_slider['from']
-        slider_max = self.position_slider['to']
-        
-        # Calculate the position based on click location
-        if slider_width > 0:
-            position_ratio = click_x / slider_width
-            position_value = slider_min + (position_ratio * (slider_max - slider_min))
-            position_value = max(slider_min, min(slider_max, position_value))  # Clamp to range
-            
-            # Set the slider and audio position immediately
-            self.position_slider.set(position_value)
-            self.audio_engine.set_position_seconds(position_value)
-    
-    def on_position_drag_start(self, event):
-        """Called when user starts dragging position slider"""
-        self.user_is_dragging_position = True
-    
-    def on_position_drag_end(self, event):
-        """Called when user finishes dragging position slider"""
-        if hasattr(self, 'user_is_dragging_position'):
-            self.user_is_dragging_position = False
-    
     def toggle_mute(self, stem_name):
         """Toggle mute for a specific stem"""
         if self.muted_states[stem_name]:
@@ -528,14 +497,22 @@ class RealTimeStemPlayer:
                 break
     
     def _update_position_gui(self, current_pos):
-        """Update position GUI elements (called from main thread)"""
-        self.updating_position_from_playback = True
-        self.position_slider.set(int(current_pos))
-        self.position_label.config(text=f"{int(current_pos//60)}:{int(current_pos%60):02d}")
-        self.updating_position_from_playback = False
+        """Clean position GUI update - only waveform playhead and time display"""
+        # Update waveform playhead
+        self.update_waveform_playhead(current_pos)
         
         # Update active section highlighting
         self.update_active_section(current_pos)
+        
+        # Update time display (keep this for reference)
+        if hasattr(self, 'time_display_label'):
+            minutes = int(current_pos // 60)
+            seconds = int(current_pos % 60)
+            total_duration = self.audio_engine.get_duration_seconds()
+            total_minutes = int(total_duration // 60)
+            total_seconds = int(total_duration % 60)
+            time_text = f"{minutes}:{seconds:02d} / {total_minutes}:{total_seconds:02d}"
+            self.time_display_label.config(text=time_text)
     
     def update_active_section(self, current_pos):
         """Highlight the currently playing section on canvas"""
@@ -555,12 +532,12 @@ class RealTimeStemPlayer:
         # Update rectangle highlighting on canvas
         for i, rect_info in enumerate(self.section_rects):
             if i == current_section:
-                # Highlight active section with thicker white border
+                # Highlight active section with thicker yellow border
                 self.section_canvas.itemconfig(rect_info['rect_id'], width=3, outline='yellow')
             else:
                 # Normal appearance
                 self.section_canvas.itemconfig(rect_info['rect_id'], width=1, outline='white')
-    
+                
     # === GUI SETUP ===
     
     def setup_gui(self):
@@ -570,7 +547,7 @@ class RealTimeStemPlayer:
         
         # Better window sizing and positioning
         window_width = 750
-        window_height = 950  # Increased to accommodate section display
+        window_height = 1200
         
         # Center the window on screen
         screen_width = self.root.winfo_screenwidth()
@@ -608,8 +585,9 @@ class RealTimeStemPlayer:
                font=("Arial", 11), bg="#FF9800", fg="white",
                width=20, height=1).pack(pady=5)
         
-        # Position control with section visualization
-        self._setup_position_control()
+        self._setup_waveform_display()
+
+        self._setup_time_display()
         
         # Volume, speed, pitch controls
         self._setup_volume_controls()
@@ -625,43 +603,26 @@ class RealTimeStemPlayer:
         # Cleanup on close
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
     
-    def _setup_position_control(self):
-        """Setup position/seek control with section visualization"""
-        pos_frame = Frame(self.root)
-        pos_frame.pack(pady=10, fill='x')
+    def _setup_time_display(self):
+        """Setup a simple time display without slider"""
+        time_frame = Frame(self.root)
+        time_frame.pack(pady=5)
         
-        Label(pos_frame, text="⏯️ POSITION & SONG SECTIONS", font=("Arial", 12, "bold")).pack()
+        self.time_display_label = Label(
+            time_frame, 
+            text="0:00 / 0:00", 
+            font=("Arial", 12, "bold"),
+            fg="#333333"
+        )
+        self.time_display_label.pack()
         
-        # Section visualization frame
-        section_container = Frame(pos_frame)
-        section_container.pack(fill='x', padx=20, pady=(5, 0))
-        
-        Label(section_container, text="Song Sections (click to jump):", font=("Arial", 9, "bold")).pack(anchor='w')
-        
-        self.section_frame = Frame(section_container, height=60, bg="white", relief="sunken", bd=1)
-        self.section_frame.pack(fill='x', pady=(2, 5))
-        self.section_frame.pack_propagate(False)  # Maintain fixed height
-        
-        # Position slider
-        control_frame = Frame(pos_frame)
-        control_frame.pack(fill='x', padx=20)
-        
-        self.position_slider = Scale(control_frame, from_=0, to=300, orient=HORIZONTAL,
-                                   command=self.on_position_change, resolution=0.1)
-        
-        # Bind mouse events for both clicking and dragging
-        self.position_slider.bind('<Button-1>', self.on_position_click)  # Click to jump
-        self.position_slider.bind('<B1-Motion>', self.on_position_drag_start)  # Start drag
-        self.position_slider.bind('<ButtonRelease-1>', self.on_position_drag_end)  # End drag
-        
-        self.position_slider.pack(fill='x')
-        
-        self.position_label = Label(control_frame, text="0:00", font=("Arial", 10))
-        self.position_label.pack()
-        
-        # Initialize section buttons list
-        self.section_buttons = []
-    
+        Label(
+            time_frame,
+            text="🎯 Click anywhere on the waveforms above to jump to that position",
+            font=("Arial", 9),
+            fg="#666666"
+        ).pack(pady=(5, 0))
+
     def _setup_volume_controls(self):
         """Setup volume control section"""
         vol_frame = Frame(self.root)
@@ -927,6 +888,234 @@ class RealTimeStemPlayer:
     def run(self):
         """Start the application"""
         self.root.mainloop()
+
+    def _setup_waveform_display(self):
+        """Setup waveform visualization with color-coded stems"""
+        import matplotlib
+        matplotlib.use('TkAgg')
+        
+        # Waveform visualization frame
+        waveform_container = Frame(self.root)
+        waveform_container.pack(fill='x', padx=20, pady=(10, 5))
+        
+        Label(waveform_container, text="🎵 STEM WAVEFORMS", font=("Arial", 12, "bold")).pack()
+        
+        # Create matplotlib figure
+        self.fig, self.waveform_axes = plt.subplots(4, 1, figsize=(12, 6), sharex=True)
+        self.fig.patch.set_facecolor('#f0f0f0')
+        
+        # Stem colors matching your existing color scheme
+        self.stem_colors = {
+            "vocals": "#FF6B6B",
+            "drums": "#4ECDC4", 
+            "bass": "#45B7D1",
+            "other": "#96CEB4"
+        }
+        
+        self.stem_names = ["vocals", "drums", "bass", "other"]
+        
+        # Initialize axes
+        for i, stem_name in enumerate(self.stem_names):
+            ax = self.waveform_axes[i]
+            ax.set_ylabel(stem_name.title(), color=self.stem_colors[stem_name], fontweight='bold')
+            ax.set_facecolor('#ffffff')
+            ax.grid(True, alpha=0.3)
+            ax.set_ylim(-1, 1)
+        
+        self.waveform_axes[-1].set_xlabel('Time (seconds)')
+        
+        # Embed matplotlib in tkinter
+        self.waveform_canvas = FigureCanvasTkAgg(self.fig, waveform_container)
+        self.waveform_canvas.get_tk_widget().pack(fill='x', padx=5, pady=5)
+        
+        # Initialize playhead line
+        self.playhead_lines = []
+        for ax in self.waveform_axes:
+            line = ax.axvline(x=0, color='red', linewidth=2, alpha=0.8, zorder=10)
+            self.playhead_lines.append(line)
+        
+        # Bind click events for seeking
+        self.waveform_canvas.mpl_connect('button_press_event', self.on_waveform_click)
+        
+        # Initialize empty waveform data
+        self.waveform_data = {}
+        self.waveform_times = None
+
+    def generate_waveforms(self):
+        """Generate downsampled waveforms for visualization"""
+        if not self.audio_engine.original_stems:
+            return
+        
+        print("🌊 Generating waveforms for visualization...")
+        
+        # Target resolution: ~1000-2000 points for smooth display
+        target_points = 1500
+        
+        self.waveform_data = {}
+        duration = self.audio_engine.get_duration_seconds()
+        
+        for stem_name in self.stem_names:
+            if stem_name in self.audio_engine.original_stems:
+                # Get stereo audio data
+                audio_data = self.audio_engine.original_stems[stem_name]
+                
+                # Convert to mono by averaging channels
+                if len(audio_data.shape) == 2:
+                    mono_audio = np.mean(audio_data, axis=1)
+                else:
+                    mono_audio = audio_data
+                
+                # Downsample for visualization
+                original_length = len(mono_audio)
+                if original_length > target_points:
+                    # Use RMS downsampling for better representation
+                    hop_length = original_length // target_points
+                    
+                    # Reshape and compute RMS for each chunk
+                    chunks = mono_audio[:len(mono_audio)//hop_length * hop_length].reshape(-1, hop_length)
+                    waveform = np.sqrt(np.mean(chunks**2, axis=1))
+                    
+                    # Alternate positive/negative for waveform appearance
+                    waveform = waveform * np.random.choice([-1, 1], size=len(waveform))
+                else:
+                    waveform = mono_audio
+                
+                # Normalize to [-1, 1]
+                if np.max(np.abs(waveform)) > 0:
+                    waveform = waveform / np.max(np.abs(waveform))
+                
+                self.waveform_data[stem_name] = waveform
+            else:
+                # Create empty waveform if stem doesn't exist
+                self.waveform_data[stem_name] = np.zeros(target_points)
+        
+        # Create time axis
+        if self.waveform_data:
+            waveform_length = len(next(iter(self.waveform_data.values())))
+            self.waveform_times = np.linspace(0, duration, waveform_length)
+        
+        print(f"✅ Generated waveforms: {waveform_length} points over {duration:.1f}s")
+
+    def update_waveform_display(self):
+        """Update the waveform display with current audio data"""
+        if not self.waveform_data or not hasattr(self, 'waveform_axes'):
+            return
+        
+        print("🎨 Updating waveform display...")
+        
+        # Clear existing plots
+        for ax in self.waveform_axes:
+            ax.clear()
+        
+        # Plot each stem
+        for i, stem_name in enumerate(self.stem_names):
+            ax = self.waveform_axes[i]
+            
+            if stem_name in self.waveform_data:
+                waveform = self.waveform_data[stem_name]
+                times = self.waveform_times
+                color = self.stem_colors[stem_name]
+                
+                # Plot waveform with gradient fill
+                ax.fill_between(times, 0, waveform, color=color, alpha=0.7, linewidth=0)
+                ax.plot(times, waveform, color=color, linewidth=0.5, alpha=0.9)
+                
+                # Add section overlays if available
+                if self.song_metadata and 'sections' in self.song_metadata:
+                    self.add_section_overlays(ax, i == 0)  # Only add labels on top plot
+                
+                # Styling
+                ax.set_ylabel(stem_name.title(), color=color, fontweight='bold', fontsize=10)
+                ax.set_facecolor('#ffffff')
+                ax.grid(True, alpha=0.2)
+                ax.set_ylim(-1.1, 1.1)
+                
+                # Remove x-axis labels except for bottom plot
+                if i < len(self.stem_names) - 1:
+                    ax.set_xticklabels([])
+            
+            # Re-add playhead line
+            line = ax.axvline(x=0, color='red', linewidth=2, alpha=0.8, zorder=10)
+            self.playhead_lines[i] = line
+        
+        # Set x-axis for bottom plot
+        duration = self.audio_engine.get_duration_seconds()
+        self.waveform_axes[-1].set_xlabel('Time (seconds)', fontsize=10)
+        self.waveform_axes[-1].set_xlim(0, duration)
+        
+        # Tight layout
+        self.fig.tight_layout()
+        self.waveform_canvas.draw()
+        
+        print("✅ Waveform display updated")
+
+    def add_section_overlays(self, ax, show_labels=False):
+        """Add section overlays to waveform display"""
+        if not self.song_metadata or 'sections' not in self.song_metadata:
+            return
+        
+        sections = self.song_metadata['sections']
+        duration = self.song_metadata.get('duration', 300)
+        
+        # Section colors (lighter/transparent versions)
+        section_colors = {
+            'intro': '#FF6B6B',
+            'verse': '#45B7D1', 
+            'chorus': '#4ECDC4',
+            'outro': '#FFA726',
+            'bridge': '#96CEB4',
+            'pre_chorus': '#FF8A65',
+            'breakdown': '#9C27B0',
+            'buildup': '#795548'
+        }
+        
+        for i, section in enumerate(sections):
+            start_time = section['start']
+            
+            # Calculate end time
+            if i < len(sections) - 1:
+                end_time = sections[i + 1]['start']
+            else:
+                end_time = duration
+            
+            dj_label = section.get('dj_label', 'unknown')
+            color = section_colors.get(dj_label, '#CCCCCC')
+            
+            # Add vertical lines at section boundaries
+            ax.axvline(x=start_time, color='black', linewidth=1, alpha=0.4, linestyle='--')
+            
+            # Add colored background for important sections
+            if dj_label in ['intro', 'outro', 'breakdown', 'chorus']:
+                ax.axvspan(start_time, end_time, color=color, alpha=0.1, zorder=0)
+            
+            # Add section labels at the top
+            if show_labels and dj_label in ['intro', 'chorus', 'bridge', 'outro', 'breakdown']:
+                mid_time = (start_time + end_time) / 2
+                ax.text(mid_time, 0.9, dj_label.replace('_', ' ').title(), 
+                       ha='center', va='center', fontsize=8, 
+                       bbox=dict(boxstyle='round,pad=0.2', facecolor=color, alpha=0.7),
+                       rotation=0 if (end_time - start_time) > 20 else 90)
+
+    def on_waveform_click(self, event):
+        """Handle clicks on waveform for seeking"""
+        if event.inaxes and event.xdata is not None:
+            # Jump to clicked position
+            clicked_time = event.xdata
+            self.jump_to_section(clicked_time)
+            print(f"🎯 Clicked waveform: jumped to {clicked_time:.1f}s")
+
+    def update_waveform_playhead(self, current_pos):
+        """Update playhead position on waveform"""
+        if not hasattr(self, 'playhead_lines') or not self.playhead_lines:
+            return
+        
+        for line in self.playhead_lines:
+            line.set_xdata([current_pos])
+        
+        # Only redraw if the change is significant (reduces CPU usage)
+        if not hasattr(self, '_last_waveform_update') or abs(current_pos - self._last_waveform_update) > 0.5:
+            self.waveform_canvas.draw_idle()  # Non-blocking redraw
+            self._last_waveform_update = current_pos
 
 if __name__ == "__main__":
     app = RealTimeStemPlayer()
