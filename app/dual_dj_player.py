@@ -7,10 +7,6 @@ import threading
 import time
 import json
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.patches as patches
 
 class DualDJPlayer:
     def __init__(self):

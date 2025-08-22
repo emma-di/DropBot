@@ -5,199 +5,118 @@
   "sections": [
     {
       "start": 0.0,
-      "label": 5.0,
+      "end": 20.06,
+      "duration": 20.06,
       "dj_label": "intro",
       "confidence": 0.9,
-      "duration": 2.46,
       "energy_level": "low",
       "mix_priority": "high"
     },
     {
-      "start": 2.46,
-      "label": 4.0,
-      "dj_label": "intro",
-      "confidence": 0.9,
-      "duration": 0.56,
-      "energy_level": "medium",
-      "mix_priority": "high"
-    },
-    {
-      "start": 3.02,
-      "label": 4.0,
-      "dj_label": "intro",
-      "confidence": 0.9,
-      "duration": 12.58,
-      "energy_level": "low",
-      "mix_priority": "high"
-    },
-    {
-      "start": 15.6,
-      "label": 4.0,
-      "dj_label": "intro",
-      "confidence": 0.9,
-      "duration": 33.12,
-      "energy_level": "medium",
-      "mix_priority": "high"
-    },
-    {
-      "start": 48.72,
-      "label": 1.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 9.19,
+      "start": 20.06,
+      "end": 40.22,
+      "duration": 20.15,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
       "energy_level": "medium",
       "mix_priority": "low"
     },
     {
-      "start": 57.91,
-      "label": 3.0,
+      "start": 40.22,
+      "end": 60.23,
+      "duration": 20.02,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "low"
+    },
+    {
+      "start": 60.23,
+      "end": 80.67,
+      "duration": 20.43,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "high",
+      "mix_priority": "low"
+    },
+    {
+      "start": 80.67,
+      "end": 100.68,
+      "duration": 20.02,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "low"
+    },
+    {
+      "start": 100.68,
+      "end": 120.7,
+      "duration": 20.02,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "low"
+    },
+    {
+      "start": 120.7,
+      "end": 141.22,
+      "duration": 20.53,
+      "dj_label": "bridge",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 141.22,
+      "end": 161.31,
+      "duration": 20.09,
+      "dj_label": "bridge",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 161.31,
+      "end": 181.37,
+      "duration": 20.06,
+      "dj_label": "bridge",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 181.37,
+      "end": 201.8,
+      "duration": 20.43,
+      "dj_label": "bridge",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 201.8,
+      "end": 222.56,
+      "duration": 20.76,
       "dj_label": "chorus",
-      "confidence": 0.85,
-      "duration": 4.55,
+      "confidence": 0.8,
       "energy_level": "high",
-      "mix_priority": "high"
+      "mix_priority": "medium"
     },
     {
-      "start": 62.46,
-      "label": 3.0,
+      "start": 222.56,
+      "end": 242.95,
+      "duration": 20.39,
       "dj_label": "chorus",
-      "confidence": 0.85,
-      "duration": 4.55,
-      "energy_level": "high",
-      "mix_priority": "high"
-    },
-    {
-      "start": 67.01,
-      "label": 3.0,
-      "dj_label": "chorus",
-      "confidence": 0.85,
-      "duration": 4.6,
-      "energy_level": "high",
-      "mix_priority": "high"
-    },
-    {
-      "start": 71.61,
-      "label": 3.0,
-      "dj_label": "chorus",
-      "confidence": 0.85,
-      "duration": 22.85,
-      "energy_level": "high",
-      "mix_priority": "high"
-    },
-    {
-      "start": 94.46,
-      "label": 2.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 17.74,
+      "confidence": 0.8,
       "energy_level": "medium",
-      "mix_priority": "low"
+      "mix_priority": "medium"
     },
     {
-      "start": 112.2,
-      "label": 1.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 18.81,
-      "energy_level": "medium",
-      "mix_priority": "low"
-    },
-    {
-      "start": 131.01,
-      "label": 1.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 22.89,
-      "energy_level": "medium",
-      "mix_priority": "low"
-    },
-    {
-      "start": 153.9,
-      "label": 2.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 4.55,
-      "energy_level": "medium",
-      "mix_priority": "low"
-    },
-    {
-      "start": 158.45,
-      "label": 2.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 4.6,
-      "energy_level": "medium",
-      "mix_priority": "low"
-    },
-    {
-      "start": 163.05,
-      "label": 2.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 13.7,
-      "energy_level": "medium",
-      "mix_priority": "low"
-    },
-    {
-      "start": 176.75,
-      "label": 1.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 26.84,
-      "energy_level": "medium",
-      "mix_priority": "low"
-    },
-    {
-      "start": 203.59,
-      "label": 3.0,
-      "dj_label": "chorus",
-      "confidence": 0.85,
-      "duration": 0.56,
-      "energy_level": "high",
-      "mix_priority": "high"
-    },
-    {
-      "start": 204.15,
-      "label": 3.0,
-      "dj_label": "chorus",
-      "confidence": 0.85,
-      "duration": 4.6,
-      "energy_level": "high",
-      "mix_priority": "high"
-    },
-    {
-      "start": 208.75,
-      "label": 3.0,
-      "dj_label": "chorus",
-      "confidence": 0.85,
-      "duration": 22.85,
-      "energy_level": "high",
-      "mix_priority": "high"
-    },
-    {
-      "start": 231.6,
-      "label": 2.0,
-      "dj_label": "verse",
-      "confidence": 0.4,
-      "duration": 9.14,
-      "energy_level": "high",
-      "mix_priority": "low"
-    },
-    {
-      "start": 240.74,
-      "label": 3.0,
+      "start": 242.95,
+      "end": 260.52,
+      "duration": 17.57,
       "dj_label": "outro",
       "confidence": 0.9,
-      "duration": 19.74,
-      "energy_level": "low",
-      "mix_priority": "high"
-    },
-    {
-      "start": 260.48,
-      "label": 5.0,
-      "dj_label": "outro",
-      "confidence": 0.9,
-      "duration": 0.04,
       "energy_level": "low",
       "mix_priority": "high"
     }
@@ -205,51 +124,29 @@
   "dj_cues": {
     "mix_in_points": [
       {
-        "time": 15.6,
+        "time": 20.06,
         "confidence": "high",
         "reason": "end_of_intro"
       }
     ],
     "mix_out_points": [
       {
-        "time": 203.59,
-        "confidence": "high",
-        "reason": "repeated_section"
+        "time": 201.8,
+        "confidence": "medium",
+        "reason": "chorus"
       },
       {
-        "time": 204.15,
-        "confidence": "high",
-        "reason": "repeated_section"
+        "time": 222.56,
+        "confidence": "medium",
+        "reason": "chorus"
       },
       {
-        "time": 208.75,
+        "time": 242.95,
         "confidence": "high",
-        "reason": "repeated_section"
-      },
-      {
-        "time": 231.6,
-        "confidence": "high",
-        "reason": "repeated_section"
-      },
-      {
-        "time": 240.74,
-        "confidence": "high",
-        "reason": "repeated_section"
-      },
-      {
-        "time": 260.48,
-        "confidence": "high",
-        "reason": "repeated_section"
+        "reason": "outro"
       }
     ],
-    "breakdown_points": [
-      {
-        "time": 240.74,
-        "duration": 19.74,
-        "energy_ratio": 0.412,
-        "confidence": "medium"
-      }
-    ]
+    "breakdown_points": []
   },
-  "analysis_version": "1.2"
+  "analysis_version": "2.1_robust"
 }
