@@ -1,3 +1,5 @@
+# Version used as of 2025-08-27
+
 import librosa
 import numpy as np
 import soundfile as sf
