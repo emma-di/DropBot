@@ -1,0 +1,176 @@
+{
+  "bpm": 74,
+  "key": "F major",
+  "duration": 309.6,
+  "sections": [
+    {
+      "start": 0.0,
+      "end": 20.02,
+      "duration": 20.02,
+      "dj_label": "intro",
+      "confidence": 0.9,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 20.02,
+      "end": 40.08,
+      "duration": 20.06,
+      "dj_label": "breakdown",
+      "confidence": 0.8,
+      "energy_level": "low",
+      "mix_priority": "high"
+    },
+    {
+      "start": 40.08,
+      "end": 60.37,
+      "duration": 20.29,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "low",
+      "mix_priority": "low"
+    },
+    {
+      "start": 60.37,
+      "end": 80.43,
+      "duration": 20.06,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "low",
+      "mix_priority": "low"
+    },
+    {
+      "start": 80.43,
+      "end": 100.47,
+      "duration": 20.04,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "medium",
+      "mix_priority": "low"
+    },
+    {
+      "start": 100.47,
+      "end": 120.93,
+      "duration": 20.46,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "low",
+      "mix_priority": "low"
+    },
+    {
+      "start": 120.93,
+      "end": 141.32,
+      "duration": 20.39,
+      "dj_label": "verse_1",
+      "confidence": 0.7,
+      "energy_level": "low",
+      "mix_priority": "low"
+    },
+    {
+      "start": 141.32,
+      "end": 161.33,
+      "duration": 20.02,
+      "dj_label": "chorus",
+      "confidence": 0.8,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 161.33,
+      "end": 181.35,
+      "duration": 20.02,
+      "dj_label": "chorus",
+      "confidence": 0.8,
+      "energy_level": "high",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 181.35,
+      "end": 201.6,
+      "duration": 20.25,
+      "dj_label": "chorus",
+      "confidence": 0.8,
+      "energy_level": "high",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 201.6,
+      "end": 221.87,
+      "duration": 20.27,
+      "dj_label": "chorus",
+      "confidence": 0.8,
+      "energy_level": "high",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 221.87,
+      "end": 242.32,
+      "duration": 20.46,
+      "dj_label": "chorus",
+      "confidence": 0.8,
+      "energy_level": "medium",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 242.32,
+      "end": 262.64,
+      "duration": 20.32,
+      "dj_label": "chorus",
+      "confidence": 0.8,
+      "energy_level": "high",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 262.64,
+      "end": 284.93,
+      "duration": 22.29,
+      "dj_label": "chorus",
+      "confidence": 0.8,
+      "energy_level": "high",
+      "mix_priority": "medium"
+    },
+    {
+      "start": 284.93,
+      "end": 309.6,
+      "duration": 24.67,
+      "dj_label": "outro",
+      "confidence": 0.9,
+      "energy_level": "low",
+      "mix_priority": "high"
+    }
+  ],
+  "dj_cues": {
+    "mix_in_points": [
+      {
+        "time": 20.02,
+        "confidence": "high",
+        "reason": "end_of_intro"
+      }
+    ],
+    "mix_out_points": [
+      {
+        "time": 242.32,
+        "confidence": "medium",
+        "reason": "chorus"
+      },
+      {
+        "time": 262.64,
+        "confidence": "medium",
+        "reason": "chorus"
+      },
+      {
+        "time": 284.93,
+        "confidence": "high",
+        "reason": "outro"
+      }
+    ],
+    "breakdown_points": [
+      {
+        "time": 20.02,
+        "duration": 20.06,
+        "confidence": "high"
+      }
+    ]
+  },
+  "analysis_version": "2.1_robust"
+}
